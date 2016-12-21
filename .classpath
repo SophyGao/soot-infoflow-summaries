@@ -6,5 +6,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/soot"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/soot-infoflow"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/heros"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

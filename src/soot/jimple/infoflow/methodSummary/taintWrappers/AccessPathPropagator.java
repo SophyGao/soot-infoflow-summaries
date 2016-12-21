@@ -21,7 +21,21 @@ class AccessPathPropagator {
 	private final Stmt stmt;
 	private final Abstraction d1;
 	private final Abstraction d2;
+//	public AccessPathPropagator lastPropagator;
+//	public MethodFlow mf;
 	
+//	public List<Pair<AccessPathPropagator,MethodFlow>> getPaths(){
+//		LinkedList<Pair<AccessPathPropagator,MethodFlow>> list=new LinkedList<Pair<AccessPathPropagator,MethodFlow>>();
+//		AccessPathPropagator cur=this;
+//		MethodFlow flow=null;
+//		do{
+//			list.addFirst(new Pair<AccessPathPropagator,MethodFlow>(cur,flow));
+//			flow=cur.mf;
+//			cur=cur.lastPropagator;
+//			
+//		}while(cur!=null);
+//		return list;
+//	}
 	public AccessPathPropagator(Taint taint) {
 		this(taint, null, null);
 	}
@@ -209,5 +223,4 @@ class AccessPathPropagator {
 			return false;
 		return true;
 	}
-	
 }

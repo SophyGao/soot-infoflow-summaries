@@ -17,7 +17,7 @@ import soot.jimple.infoflow.methodSummary.generator.SummaryGenerator;
 import soot.jimple.infoflow.methodSummary.generator.SummaryGeneratorFactory;
 import soot.jimple.infoflow.methodSummary.xml.XMLWriter;
 
-class Main {
+public class Main {
 	final List<String> failedMethos = new LinkedList<>();
 	
 	public static void main(final String[] args) throws FileNotFoundException, XMLStreamException {

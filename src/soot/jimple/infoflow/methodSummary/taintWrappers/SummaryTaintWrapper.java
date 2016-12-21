@@ -1,9 +1,5 @@
 package soot.jimple.infoflow.methodSummary.taintWrappers;
 
-import heros.solver.IDESolver;
-import heros.solver.Pair;
-import heros.solver.PathEdge;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -12,6 +8,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+
+import heros.solver.IDESolver;
+import heros.solver.Pair;
+import heros.solver.PathEdge;
 import soot.ArrayType;
 import soot.FastHierarchy;
 import soot.Hierarchy;
@@ -33,8 +35,8 @@ import soot.jimple.Stmt;
 import soot.jimple.infoflow.InfoflowManager;
 import soot.jimple.infoflow.data.Abstraction;
 import soot.jimple.infoflow.data.AccessPath;
-import soot.jimple.infoflow.data.AccessPathFactory;
 import soot.jimple.infoflow.data.AccessPath.ArrayTaintType;
+import soot.jimple.infoflow.data.AccessPathFactory;
 import soot.jimple.infoflow.data.SootMethodAndClass;
 import soot.jimple.infoflow.methodSummary.data.provider.IMethodSummaryProvider;
 import soot.jimple.infoflow.methodSummary.data.sourceSink.AbstractFlowSinkSource;
@@ -49,9 +51,6 @@ import soot.jimple.infoflow.util.SystemClassHandler;
 import soot.jimple.infoflow.util.TypeUtils;
 import soot.util.ConcurrentHashMultiMap;
 import soot.util.MultiMap;
-
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 
 /**
  * Taint wrapper implementation that applies method summaries created by
@@ -482,9 +481,6 @@ public class SummaryTaintWrapper implements ITaintPropagationWrapper {
 		// We only care about method invocations
 		if (!stmt.containsInvokeExpr())
 			return Collections.singleton(taintedAbs);
-		
-		if (stmt.toString().equals("specialinvoke $r3.<java.lang.StringBuilder: void <init>(java.lang.String)>($r4)"))
-			System.out.println("x");
 		
 		Set<Abstraction> resAbs = null;
 		Collection<SootMethod> callees = manager.getICFG().getCalleesOfCallAt(stmt);
@@ -1040,7 +1036,6 @@ public class SummaryTaintWrapper implements ITaintPropagationWrapper {
 					taintGap, taintSubFields);
 		if (newTaint == null)
 			return null;
-		
 		AccessPathPropagator newPropagator = new AccessPathPropagator(newTaint,
 				gap, parent, stmt, d1, d2);
 		return newPropagator;

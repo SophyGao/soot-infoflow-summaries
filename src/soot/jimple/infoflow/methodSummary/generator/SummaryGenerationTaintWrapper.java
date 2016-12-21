@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+
 import soot.Scene;
 import soot.SootMethod;
 import soot.Value;
@@ -73,7 +74,6 @@ public class SummaryGenerationTaintWrapper implements ITaintPropagationWrapper {
 		
 		// Do create the gap
 		GapDefinition gap = gapManager.getOrCreateGapForCall(summaries, stmt);
-		
 		// Produce a continuation
 		Set<Abstraction> res = new HashSet<Abstraction>();
 		if (stmt.getInvokeExpr() instanceof InstanceInvokeExpr) {
@@ -92,6 +92,7 @@ public class SummaryGenerationTaintWrapper implements ITaintPropagationWrapper {
 					((DefinitionStmt) stmt).getLeftOp(), true);
 			res.add(getContinuation(taintedPath, ap, gap, stmt));
 		}
+		
 		
 		return res;
 	}

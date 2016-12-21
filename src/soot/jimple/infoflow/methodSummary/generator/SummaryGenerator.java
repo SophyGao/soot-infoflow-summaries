@@ -15,6 +15,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import soot.G;
+import soot.PointsToAnalysis;
+import soot.PointsToSet;
 import soot.Scene;
 import soot.SootClass;
 import soot.SootMethod;
@@ -44,6 +46,7 @@ import soot.jimple.infoflow.nativ.INativeCallHandler;
 import soot.jimple.infoflow.results.InfoflowResults;
 import soot.jimple.infoflow.solver.cfg.IInfoflowCFG;
 import soot.jimple.infoflow.taintWrappers.ITaintPropagationWrapper;
+import soot.jimple.spark.pag.PAG;
 import soot.options.Options;
 
 /**
@@ -369,7 +372,7 @@ public class SummaryGenerator {
 		final SummarySourceSinkManager manager = new SummarySourceSinkManager(
 				methodSig, parentClass, sourceSinkFactory);
 		final MethodSummaries summaries = new MethodSummaries();
-		
+		config.setSourceMethod(methodSig);
 		final Infoflow infoflow = initInfoflow(summaries, gapManager);
 		
 		final SummaryTaintPropagationHandler listener = new SummaryTaintPropagationHandler(
@@ -384,6 +387,12 @@ public class SummaryGenerator {
 			@Override
 			public void onAfterCallgraphConstruction() {
 				listener.addExcludedMethod(Scene.v().getMethod(DUMMY_MAIN_SIG));
+				PAG pag=(PAG) Scene.v().getPointsToAnalysis();
+				System.out.println(methodSig);
+				System.out.println(pag.getSourceMethod());
+				if(!methodSig.equals(pag.getSourceMethod())){
+					System.out.println("ERROR");
+				}
 			}
 			
 		}));
@@ -468,6 +477,7 @@ public class SummaryGenerator {
 		// retain the contents of the callees.
 		Infoflow iFlow = getInfoflowInstance();
 		InfoflowConfiguration.setMergeNeighbors(true);
+		
 		iFlow.setConfig(config);	
 		
 		if (nativeCallHandler == null)
