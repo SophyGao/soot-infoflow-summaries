@@ -15,8 +15,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import soot.G;
-import soot.PointsToAnalysis;
-import soot.PointsToSet;
 import soot.Scene;
 import soot.SootClass;
 import soot.SootMethod;
@@ -46,7 +44,8 @@ import soot.jimple.infoflow.nativ.INativeCallHandler;
 import soot.jimple.infoflow.results.InfoflowResults;
 import soot.jimple.infoflow.solver.cfg.IInfoflowCFG;
 import soot.jimple.infoflow.taintWrappers.ITaintPropagationWrapper;
-import soot.jimple.spark.pag.PAG;
+import soot.jimple.spark.summary.ClassObjects;
+import soot.jimple.spark.summary.MethodObjects;
 import soot.options.Options;
 
 /**
@@ -195,6 +194,8 @@ public class SummaryGenerator {
 				}
 			
 			MethodSummaries curSummaries = null;
+			ClassObjects classObjects=new ClassObjects(entry.getKey());
+			int lastGapId=0;
 			for (int i = 0; i < config.getRepeatCount(); i++) {
 				// Clean up the memory so that we don't get any remnants from the last run
 				System.gc();
@@ -202,22 +203,36 @@ public class SummaryGenerator {
 				System.out.println("Analyzing class " + entry.getKey());
 				
 				curSummaries = new MethodSummaries();
+				
 				for (String methodSig : entry.getValue()) {
-					MethodSummaries newSums = createMethodSummary(classpath,
-							methodSig, entry.getKey(), gapManager);
-					if (handler != null)
-						handler.onMethodFinished(methodSig, curSummaries);
-					curSummaries.merge(newSums);
+					//TODO
+						
+					MethodObjects methodObjects=null;
+					if(!classObjects.analyzed(methodSig)){
+						methodObjects=new MethodObjects(methodSig,lastGapId);
+					}
+					//if(methodSig.contains("java.io.BufferedWriter: void close()")){
+						MethodSummaries newSums = createMethodSummary(classpath,
+								methodSig, entry.getKey(), gapManager,methodObjects);
+						if (handler != null)
+							handler.onMethodFinished(methodSig, curSummaries);
+						curSummaries.merge(newSums);
+						if(methodObjects!=null){
+							lastGapId=methodObjects.getLastGapId();
+							classObjects.merge(methodObjects);
+						}
+						
+					//}
 				}
 				
 				System.out.println("Class summaries for " + entry.getKey() + " done in "
 						+ (System.nanoTime() - nanosBeforeClass) / 1E9 + " seconds for "
 						+ curSummaries.getFlowCount() + " summaries");
 			}
-			
+			classObjects.setLastGapId(lastGapId);
 			// Notify the handler that we're done
 			if (handler != null)
-				handler.onClassFinished(entry.getKey(), curSummaries);
+				handler.onClassFinished(entry.getKey(), curSummaries,classObjects);
 			summaries.merge(entry.getKey(), curSummaries);
 			
 			// Remove duplicate summaries on alias flows. We need to re-do this
@@ -338,7 +353,7 @@ public class SummaryGenerator {
 	public MethodSummaries createMethodSummary(String classpath, String methodSig) {
 		return createMethodSummary(classpath, methodSig,
 				"",
-				new GapManager());
+				new GapManager(),null);
 	}
 
 	/**
@@ -363,7 +378,7 @@ public class SummaryGenerator {
 	 */
 	private MethodSummaries createMethodSummary(String classpath,
 			final String methodSig, final String parentClass,
-			final GapManager gapManager) {
+			final GapManager gapManager,MethodObjects methodObjects) {
 		System.out.println("Computing method summary for " + methodSig);
 		long nanosBeforeMethod = System.nanoTime();
 		
@@ -372,7 +387,7 @@ public class SummaryGenerator {
 		final SummarySourceSinkManager manager = new SummarySourceSinkManager(
 				methodSig, parentClass, sourceSinkFactory);
 		final MethodSummaries summaries = new MethodSummaries();
-		config.setSourceMethod(methodSig);
+		
 		final Infoflow infoflow = initInfoflow(summaries, gapManager);
 		
 		final SummaryTaintPropagationHandler listener = new SummaryTaintPropagationHandler(
@@ -387,12 +402,6 @@ public class SummaryGenerator {
 			@Override
 			public void onAfterCallgraphConstruction() {
 				listener.addExcludedMethod(Scene.v().getMethod(DUMMY_MAIN_SIG));
-				PAG pag=(PAG) Scene.v().getPointsToAnalysis();
-				System.out.println(methodSig);
-				System.out.println(pag.getSourceMethod());
-				if(!methodSig.equals(pag.getSourceMethod())){
-					System.out.println("ERROR");
-				}
 			}
 			
 		}));
@@ -409,7 +418,7 @@ public class SummaryGenerator {
 		});
 
 		try {
-			infoflow.computeInfoflow(null, classpath, createEntryPoint(
+			infoflow.computeInfoflow(null, classpath,methodObjects, createEntryPoint(
 					Collections.singletonList(methodSig), parentClass), manager);
 		}
 		catch (Exception e) {

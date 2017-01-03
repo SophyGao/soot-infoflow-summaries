@@ -1,6 +1,7 @@
 package soot.jimple.infoflow.methodSummary.generator;
 
 import soot.jimple.infoflow.methodSummary.data.summary.MethodSummaries;
+import soot.jimple.spark.summary.ClassObjects;
 
 /**
  * Handler that gets invoked when summaries have been generated for the methods
@@ -31,6 +32,6 @@ public interface IClassSummaryHandler {
 	 * @param className The class for which all methods have been summarized
 	 * @param summaries The method summaries
 	 */
-	public void onClassFinished(String className, MethodSummaries summaries);
+	public void onClassFinished(String className, MethodSummaries summaries,ClassObjects classObjects);
 
 }

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
@@ -16,6 +17,9 @@ import soot.jimple.infoflow.methodSummary.generator.IClassSummaryHandler;
 import soot.jimple.infoflow.methodSummary.generator.SummaryGenerator;
 import soot.jimple.infoflow.methodSummary.generator.SummaryGeneratorFactory;
 import soot.jimple.infoflow.methodSummary.xml.XMLWriter;
+import soot.jimple.spark.summary.ClassObjects;
+import soot.jimple.spark.summary.MethodObjects;
+import soot.jimple.spark.xml.PAGWriter;
 
 public class Main {
 	final List<String> failedMethos = new LinkedList<>();
@@ -99,10 +103,11 @@ public class Main {
 			}
 			
 			@Override
-			public void onClassFinished(String className, MethodSummaries summaries) {
+			public void onClassFinished(String className, MethodSummaries summaries,ClassObjects classObjects) {
 				// Write out the class
 				String summaryFile = className + ".xml";
-				write(summaries, summaryFile, args[1]);
+				write(classObjects,summaryFile,args[1]);
+				//write(summaries, summaryFile, args[1]);
 				System.out.println("Class " + className + " done.");
 			}
 			
@@ -157,5 +162,22 @@ public class Main {
 			throw new RuntimeException(e);
 		}
 	}
+	private static void write(ClassObjects classObjects, String fileName, String folder) {
+		// Create the target folder if it does not exist
+		File f = new File(folder);
+		if(!f.exists())
+			f.mkdir();
+		
+		// Dump the flows
+		PAGWriter writer = new PAGWriter();
 
+		try {
+			writer.write(new File(f,fileName),classObjects);
+		} catch (XMLStreamException e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		}
+	}
 }
