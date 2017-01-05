@@ -30,8 +30,6 @@ public class XMLConstants {
 	public static final String TREE_FLOW = "flow";
 	public static final String TREE_SINK = "to";
 	public static final String TREE_SOURCE = "from";
-	public static final String TREE_GAPS = "gaps";
-	public static final String TREE_GAP = "gap";
 	
 	public static final String ATTRIBUTE_FORMAT_VERSION = "fileFormatVersion";
 	public static final String ATTRIBUTE_ID = "num";

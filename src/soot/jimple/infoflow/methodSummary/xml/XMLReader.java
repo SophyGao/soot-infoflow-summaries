@@ -26,28 +26,35 @@ import soot.jimple.infoflow.methodSummary.data.sourceSink.FlowSource;
 import soot.jimple.infoflow.methodSummary.data.summary.MethodFlow;
 import soot.jimple.infoflow.methodSummary.data.summary.MethodSummaries;
 import soot.jimple.infoflow.methodSummary.data.summary.SourceSinkType;
+import soot.jimple.spark.summary.ClassObjects;
+import soot.jimple.spark.summary.ClassesObjects;
+import soot.jimple.spark.summary.GapDefinition;
+import soot.jimple.spark.xml.SummaryXMLException;
+import soot.options.Options;
 
 public class XMLReader {
 	
 	private boolean validateSummariesOnRead = false;
 	
 	private enum State{
-		summary, methods, method, flow, gaps, gap
+		summary, methods, method, flow
 	}
-
-	/**
-	 * Reads a summary xml file and returns the MethodSummaries which are saved
-	 * in that file
-	 * @param fileName The file from which to read the method summaries 
-	 * @return The summary data object read from the given file
-	 * @return XMLStreamException Thrown in case of a syntax error in the input
-	 * file
-	 * @throws IOException Thrown if the file could not be read
-	 */
-	public MethodSummaries read(File fileName) throws XMLStreamException,
-			SummaryXMLException, IOException{
+	
+	public MethodSummaries read(File fileName,String className) 
+			throws XMLStreamException, SummaryXMLException, IOException{
+		ClassesObjects classesObjects=Options.v().classes_objects();
+		ClassObjects classObjects=classesObjects.getClassObjects(className);
+		return read(fileName,className,classObjects);
+	}
+	public MethodSummaries read(File fileName,String className,ClassesObjects classesObjects)
+			throws XMLStreamException, SummaryXMLException, IOException{
+		ClassObjects classObjects=classesObjects.getClassObjects(className);
+		return read(fileName,className,classObjects);
+	}
+	
+	public MethodSummaries read(File fileName,String className,ClassObjects classObjects)
+			throws XMLStreamException,SummaryXMLException, IOException{
 		MethodSummaries summary = new MethodSummaries();
-		
 		InputStream in = null;
 		XMLStreamReader reader = null;
 		try {
@@ -58,7 +65,6 @@ public class XMLReader {
 			Map<String, String> sinkAttributes = new HashMap<String,String>();
 			
 			String currentMethod = "";
-			int currentID = -1;
 			boolean isAlias = false;
 			
 			State state = State.summary;
@@ -118,8 +124,8 @@ public class XMLReader {
 					if(state == State.flow){
 						state = State.method;					
 						MethodFlow flow = new MethodFlow(currentMethod,
-								createSource(summary, sourceAttributes),
-								createSink(summary, sinkAttributes),
+								createSource(classObjects, sourceAttributes),
+								createSink(classObjects, sinkAttributes),
 								isAlias);
 						summary.addFlow(flow);
 						
@@ -131,35 +137,6 @@ public class XMLReader {
 				else if (reader.getLocalName().equals(XMLConstants.TREE_METHODS) && reader.isEndElement()) {
 					if (state == State.methods)
 						state = State.summary;
-					else
-						throw new SummaryXMLException();
-				}
-				else if(reader.getLocalName().equals(XMLConstants.TREE_GAPS) && reader.isStartElement()){
-					if(state == State.summary)
-						state = State.gaps;
-					else
-						throw new SummaryXMLException();
-				}
-				else if(reader.getLocalName().equals(XMLConstants.TREE_GAPS) && reader.isEndElement()){
-					if(state == State.gaps)
-						state = State.summary;
-					else
-						throw new SummaryXMLException();
-				}
-				else if(reader.getLocalName().equals(XMLConstants.TREE_GAP) && reader.isStartElement()){
-					if(state == State.gaps) {
-						currentMethod = getAttributeByName(reader, XMLConstants.ATTRIBUTE_METHOD_SIG);
-						currentID = Integer.valueOf(getAttributeByName(reader, XMLConstants.ATTRIBUTE_ID));
-						summary.getOrCreateGap(currentID, currentMethod);
-						state = State.gap;
-					}
-					else
-						throw new SummaryXMLException();
-				}
-				else if (reader.getLocalName().equals(XMLConstants.TREE_GAP) && reader.isEndElement()){
-					if(state == State.gap) {
-						state = State.gaps;
-					}
 					else
 						throw new SummaryXMLException();
 				}
@@ -202,14 +179,14 @@ public class XMLReader {
 	 * @return The newly created source data object
 	 * @throws SummaryXMLException
 	 */
-	private FlowSource createSource(MethodSummaries summary,
+	private FlowSource createSource(ClassObjects classObjects,
 			Map<String, String> attributes) throws SummaryXMLException{
 		if (isField(attributes)) {
 			return new FlowSource(SourceSinkType.Field,
 					getBaseType(attributes),
 					getAccessPath(attributes),
 					getAccessPathTypes(attributes),
-					getGapDefinition(attributes, summary));
+					getGapDefinition(attributes, classObjects));
 		}
 		else if (isParameter(attributes)) {
 			return new FlowSource(SourceSinkType.Parameter,
@@ -217,15 +194,15 @@ public class XMLReader {
 					getBaseType(attributes), 
 					getAccessPath(attributes),
 					getAccessPathTypes(attributes),
-					getGapDefinition(attributes, summary));
+					getGapDefinition(attributes, classObjects));
 		}
 		else if (isGapBaseObject(attributes)) {
 			return new FlowSource(SourceSinkType.GapBaseObject,
 					getBaseType(attributes),
-					getGapDefinition(attributes, summary));
+					getGapDefinition(attributes, classObjects));
 		}
 		else if (isReturn(attributes)) {
-			GapDefinition gap = getGapDefinition(attributes, summary);
+			GapDefinition gap = getGapDefinition(attributes, classObjects);
 			if (gap == null)
 				throw new SummaryXMLException("Return values can only be "
 						+ "sources if they have a gap specification");
@@ -234,7 +211,7 @@ public class XMLReader {
 					getBaseType(attributes), 
 					getAccessPath(attributes),
 					getAccessPathTypes(attributes),
-					getGapDefinition(attributes, summary));
+					getGapDefinition(attributes, classObjects));
 		}
 		throw new SummaryXMLException("Invalid flow source definition");
 	}
@@ -246,7 +223,7 @@ public class XMLReader {
 	 * @return The newly created sink data object
 	 * @throws SummaryXMLException
 	 */
-	private FlowSink createSink(MethodSummaries summary,
+	private FlowSink createSink(ClassObjects classObjects,
 			Map<String, String> attributes) throws SummaryXMLException{
 		if (isField(attributes)) {
 			return new FlowSink(SourceSinkType.Field,
@@ -254,7 +231,7 @@ public class XMLReader {
 					getAccessPath(attributes),
 					getAccessPathTypes(attributes),
 					taintSubFields(attributes),
-					getGapDefinition(attributes, summary));
+					getGapDefinition(attributes, classObjects));
 		}
 		else if (isParameter(attributes)) {
 			return new FlowSink(SourceSinkType.Parameter,
@@ -263,7 +240,7 @@ public class XMLReader {
 					getAccessPath(attributes),
 					getAccessPathTypes(attributes),
 					taintSubFields(attributes),
-					getGapDefinition(attributes, summary));
+					getGapDefinition(attributes, classObjects));
 		}
 		else if (isReturn(attributes)) {
 			return new FlowSink(SourceSinkType.Return,
@@ -271,14 +248,14 @@ public class XMLReader {
 					getAccessPath(attributes),
 					getAccessPathTypes(attributes),
 					taintSubFields(attributes),
-					getGapDefinition(attributes, summary));
+					getGapDefinition(attributes, classObjects));
 		}
 		else if (isGapBaseObject(attributes)) {
 			return new FlowSink(SourceSinkType.GapBaseObject,
 					-1,
 					getBaseType(attributes),
 					false,
-					getGapDefinition(attributes, summary));
+					getGapDefinition(attributes, classObjects));
 		}
 		throw new SummaryXMLException();
 	}
@@ -338,22 +315,6 @@ public class XMLReader {
 		return val != null && val.equals(VALUE_TRUE);
 	}
 	
-	private GapDefinition getGapDefinition(Map<String, String> attributes,
-			MethodSummaries summary) {
-		String id = attributes.get(XMLConstants.ATTRIBUTE_GAP);
-		if (id == null  || id.isEmpty())
-			return null;
-		
-		// Do we already have a suitable gap definition?
-		GapDefinition gap = summary.getGap(Integer.parseInt(id));
-		if (gap != null)
-			return gap;
-		
-		// We have not read in this gap definition yet and need to create a stub
-		// for the time being.
-		return summary.createTemporaryGap(Integer.parseInt(id));
-	}
-	
 	/**
 	 * Sets whether summaries shall be validated after they are read from disk
 	 * @param validateSummariesOnRead True if summaries shall be validated after
@@ -361,6 +322,15 @@ public class XMLReader {
 	 */
 	public void setValidateSummariesOnRead(boolean validateSummariesOnRead) {
 		this.validateSummariesOnRead = validateSummariesOnRead;
+	}
+	private GapDefinition getGapDefinition(Map<String, String> attributes,ClassObjects classObjects){
+		String id = attributes.get(XMLConstants.ATTRIBUTE_GAP);
+		if (id == null  || id.isEmpty()||classObjects==null)
+			return null;
+		
+		
+		GapDefinition gap = classObjects.getGap(Integer.parseInt(id));
+		return gap;
 	}
 	
 }

@@ -113,7 +113,7 @@ public class LazySummaryProvider implements IMethodSummaryProvider {
 		for (File f : files) {
 			if (fileToClass(f).equals(clazz)) {
 				try {
-					summaries.merge(clazz, reader.read(f));
+					summaries.merge(clazz, reader.read(f,clazz));
 					loadableClasses.remove(clazz);
 					supportedClasses.add(clazz);
 					break;

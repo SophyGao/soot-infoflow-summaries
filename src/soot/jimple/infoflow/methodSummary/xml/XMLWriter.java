@@ -27,7 +27,6 @@ import soot.jimple.infoflow.methodSummary.data.sourceSink.AbstractFlowSinkSource
 import soot.jimple.infoflow.methodSummary.data.summary.ClassSummaries;
 import soot.jimple.infoflow.methodSummary.data.summary.MethodFlow;
 import soot.jimple.infoflow.methodSummary.data.summary.MethodSummaries;
-import soot.jimple.spark.summary.GapDefinition;
 
 public class XMLWriter  {
 	
