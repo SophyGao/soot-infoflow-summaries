@@ -1,7 +1,5 @@
 package soot.jimple.infoflow.methodSummary.data.summary;
 
-import java.util.Map;
-
 import soot.RefType;
 import soot.Scene;
 import soot.Type;
@@ -99,19 +97,6 @@ public class MethodFlow {
 	 */
 	public boolean isCustom() {
 		return from.isCustom() || to.isCustom();
-	}
-	
-	/**
-	 * Replaces the gaps in this flow definition according to the given map
-	 * @param replacementMap A mapping from gap id to new gap data object
-	 * @return A copy of this flow definition in which the gaps that also occur
-	 * in the given map have been replaced with the values from the map
-	 */
-	public MethodFlow replaceGaps(Map<Integer, GapDefinition> replacementMap) {
-		if (replacementMap == null)
-			return this;
-		return new MethodFlow(methodSig, from.replaceGaps(replacementMap),
-				to.replaceGaps(replacementMap), isAlias);
 	}
 	
 	/**

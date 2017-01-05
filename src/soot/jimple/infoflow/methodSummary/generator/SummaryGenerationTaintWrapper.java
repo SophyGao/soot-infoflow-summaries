@@ -18,12 +18,12 @@ import soot.jimple.infoflow.data.AccessPath;
 import soot.jimple.infoflow.data.AccessPathFactory;
 import soot.jimple.infoflow.data.SourceContext;
 import soot.jimple.infoflow.methodSummary.data.sourceSink.FlowSource;
-import soot.jimple.infoflow.methodSummary.data.summary.GapDefinition;
 import soot.jimple.infoflow.methodSummary.data.summary.MethodSummaries;
 import soot.jimple.infoflow.methodSummary.data.summary.SourceSinkType;
 import soot.jimple.infoflow.methodSummary.util.AliasUtils;
 import soot.jimple.infoflow.solver.cfg.IInfoflowCFG;
 import soot.jimple.infoflow.taintWrappers.ITaintPropagationWrapper;
+import soot.jimple.spark.summary.GapDefinition;
 import soot.jimple.toolkits.callgraph.Edge;
 
 /**
@@ -39,8 +39,7 @@ public class SummaryGenerationTaintWrapper implements ITaintPropagationWrapper {
 	protected IInfoflowCFG icfg;
 	
 	protected final MethodSummaries summaries;
-	protected final GapManager gapManager;
-	
+	GapManager gapManager;
 	public SummaryGenerationTaintWrapper(MethodSummaries summaries,
 			GapManager gapManager) {
 		this.summaries = summaries;
@@ -73,7 +72,7 @@ public class SummaryGenerationTaintWrapper implements ITaintPropagationWrapper {
 			return Collections.singleton(taintedPath);
 		
 		// Do create the gap
-		GapDefinition gap = gapManager.getOrCreateGapForCall(summaries, stmt);
+		GapDefinition gap = gapManager.getGapForCall(stmt);
 		// Produce a continuation
 		Set<Abstraction> res = new HashSet<Abstraction>();
 		if (stmt.getInvokeExpr() instanceof InstanceInvokeExpr) {

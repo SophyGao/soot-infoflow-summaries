@@ -24,7 +24,6 @@ import soot.jimple.infoflow.data.AccessPath;
 import soot.jimple.infoflow.methodSummary.data.factory.SourceSinkFactory;
 import soot.jimple.infoflow.methodSummary.data.sourceSink.FlowSink;
 import soot.jimple.infoflow.methodSummary.data.sourceSink.FlowSource;
-import soot.jimple.infoflow.methodSummary.data.summary.GapDefinition;
 import soot.jimple.infoflow.methodSummary.data.summary.MethodFlow;
 import soot.jimple.infoflow.methodSummary.data.summary.MethodSummaries;
 import soot.jimple.infoflow.methodSummary.generator.GapManager;
@@ -34,6 +33,7 @@ import soot.jimple.infoflow.methodSummary.postProcessor.SummaryPathBuilder.Summa
 import soot.jimple.infoflow.methodSummary.util.AliasUtils;
 import soot.jimple.infoflow.solver.cfg.IInfoflowCFG;
 import soot.jimple.infoflow.util.SootMethodRepresentationParser;
+import soot.jimple.spark.summary.GapDefinition;
 import soot.util.MultiMap;
 
 public class InfoflowResultPostProcessor {

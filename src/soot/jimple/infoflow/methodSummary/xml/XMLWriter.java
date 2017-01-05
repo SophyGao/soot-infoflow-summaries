@@ -25,9 +25,9 @@ import javax.xml.stream.XMLStreamWriter;
 
 import soot.jimple.infoflow.methodSummary.data.sourceSink.AbstractFlowSinkSource;
 import soot.jimple.infoflow.methodSummary.data.summary.ClassSummaries;
-import soot.jimple.infoflow.methodSummary.data.summary.GapDefinition;
 import soot.jimple.infoflow.methodSummary.data.summary.MethodFlow;
 import soot.jimple.infoflow.methodSummary.data.summary.MethodSummaries;
+import soot.jimple.spark.summary.GapDefinition;
 
 public class XMLWriter  {
 	
@@ -81,22 +81,22 @@ public class XMLWriter  {
 		writeMethodFlows(summary, writer);
 		writer.writeEndElement(); //end methods tree
 		
-		writer.writeStartElement(XMLConstants.TREE_GAPS);		
-		writeGaps(summary, writer);
-		writer.writeEndElement(); //end gaps tree
+//		writer.writeStartElement(XMLConstants.TREE_GAPS);		
+//		writeGaps(summary, writer);
+//		writer.writeEndElement(); //end gaps tree
 		
 		writer.writeEndDocument();
 		writer.close();
 	}
 
-	private void writeGaps(MethodSummaries summary, XMLStreamWriter writer) throws XMLStreamException {
-		for (GapDefinition gap : summary.getGaps().values()) {
-			writer.writeStartElement(XMLConstants.TREE_GAP);
-			writer.writeAttribute(XMLConstants.ATTRIBUTE_ID, gap.getID() + "");			
-			writer.writeAttribute(XMLConstants.ATTRIBUTE_METHOD_SIG, gap.getSignature());
-			writer.writeEndElement(); // close gap
-		}
-	}
+//	private void writeGaps(MethodSummaries summary, XMLStreamWriter writer) throws XMLStreamException {
+//		for (GapDefinition gap : summary.getGaps().values()) {
+//			writer.writeStartElement(XMLConstants.TREE_GAP);
+//			writer.writeAttribute(XMLConstants.ATTRIBUTE_ID, gap.getID() + "");			
+//			writer.writeAttribute(XMLConstants.ATTRIBUTE_METHOD_SIG, gap.getSignature());
+//			writer.writeEndElement(); // close gap
+//		}
+//	}
 
 	private void writeMethodFlows(MethodSummaries summary, XMLStreamWriter writer) throws XMLStreamException {
 		for (Entry<String, Set<MethodFlow>> m : summary.getFlows().entrySet()) {

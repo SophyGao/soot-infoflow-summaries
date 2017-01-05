@@ -3,8 +3,8 @@ package soot.jimple.infoflow.methodSummary.data.sourceSink;
 import java.util.Arrays;
 import java.util.Map;
 
-import soot.jimple.infoflow.methodSummary.data.summary.GapDefinition;
 import soot.jimple.infoflow.methodSummary.data.summary.SourceSinkType;
+import soot.jimple.spark.summary.GapDefinition;
 
 /**
  * Representation of a flow source
@@ -87,22 +87,6 @@ public class FlowSource extends AbstractFlowSinkSource {
 		if (getType() == SourceSinkType.Return && getGap() == null)
 			throw new RuntimeException("Return values cannot be sources. "
 					+ "Offending method: " + methodName);
-	}
-
-	/**
-	 * Replaces the gaps in this source definition according to the given map
-	 * @param replacementMap A mapping from gap id to new gap data object
-	 * @return A copy of this source definition in which the gaps that also
-	 * occur in the given map have been replaced with the values from the map
-	 */
-	public FlowSource replaceGaps(Map<Integer, GapDefinition> replacementMap) {
-		if (gap == null)
-			return this;
-		GapDefinition newGap = replacementMap.get(gap.getID());
-		if (newGap == null)
-			return this;
-		return new FlowSource(type, parameterIdx, baseType, accessPath,
-				accessPathTypes, newGap);
 	}
 	
 }

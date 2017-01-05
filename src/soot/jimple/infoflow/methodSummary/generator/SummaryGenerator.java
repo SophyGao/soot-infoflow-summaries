@@ -178,14 +178,12 @@ public class SummaryGenerator {
 		
 		// Make sure that we don't have any strange leftovers
 		G.reset();
-		
-		// We share one gap manager across all method analyses
-		final GapManager gapManager = new GapManager();
-
+		GapManager gapManager = new GapManager();
 		// Do the actual analysis
 		ClassSummaries summaries = new ClassSummaries();
 		for (Entry<String, Collection<String>> entry : methodsToAnalyze
 				.entrySet()) {
+			
 			// Check if we really need to analyze this class
 			if (handler != null)
 				if (!handler.onBeforeAnalyzeClass(entry.getKey())) {
@@ -401,6 +399,7 @@ public class SummaryGenerator {
 			
 			@Override
 			public void onAfterCallgraphConstruction() {
+				gapManager.setGaps();
 				listener.addExcludedMethod(Scene.v().getMethod(DUMMY_MAIN_SIG));
 			}
 			

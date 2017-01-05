@@ -2,7 +2,7 @@ package soot.jimple.infoflow.methodSummary.taintWrappers;
 
 import soot.jimple.Stmt;
 import soot.jimple.infoflow.data.Abstraction;
-import soot.jimple.infoflow.methodSummary.data.summary.GapDefinition;
+import soot.jimple.spark.summary.GapDefinition;
 
 /**
  * Class for describing an element at the frontier of the access path

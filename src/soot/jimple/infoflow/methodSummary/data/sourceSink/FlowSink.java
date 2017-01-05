@@ -3,9 +3,9 @@ package soot.jimple.infoflow.methodSummary.data.sourceSink;
 import java.util.Arrays;
 import java.util.Map;
 
-import soot.jimple.infoflow.methodSummary.data.summary.GapDefinition;
 import soot.jimple.infoflow.methodSummary.data.summary.SourceSinkType;
 import soot.jimple.infoflow.methodSummary.xml.XMLConstants;
+import soot.jimple.spark.summary.GapDefinition;
 
 /**
  * Representation of a flow sink.
@@ -150,21 +150,4 @@ public class FlowSink extends AbstractFlowSinkSource {
 			throw new RuntimeException("Gap base flows must always be linked "
 					+ "with gaps. Offending method: " + methodName);
 	}
-	
-	/**
-	 * Replaces the gaps in this sink definition according to the given map
-	 * @param replacementMap A mapping from gap id to new gap data object
-	 * @return A copy of this sink definition in which the gaps that also occur
-	 * in the given map have been replaced with the values from the map
-	 */
-	public FlowSink replaceGaps(Map<Integer, GapDefinition> replacementMap) {
-		if (gap == null)
-			return this;
-		GapDefinition newGap = replacementMap.get(gap.getID());
-		if (newGap == null)
-			return this;
-		return new FlowSink(type, parameterIdx, baseType, accessPath,
-				accessPathTypes, taintSubFields, newGap);
-	}
-
 }

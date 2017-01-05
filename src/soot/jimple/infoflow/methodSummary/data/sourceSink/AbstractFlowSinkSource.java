@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import soot.jimple.infoflow.InfoflowConfiguration;
-import soot.jimple.infoflow.methodSummary.data.summary.GapDefinition;
 import soot.jimple.infoflow.methodSummary.data.summary.SourceSinkType;
 import soot.jimple.infoflow.methodSummary.xml.XMLConstants;
+import soot.jimple.spark.summary.GapDefinition;
 
 /**
  * Data class which stores the data associated to a Sink or a Source of a method

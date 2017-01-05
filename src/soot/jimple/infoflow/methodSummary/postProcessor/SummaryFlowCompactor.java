@@ -8,9 +8,9 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import soot.jimple.infoflow.methodSummary.data.summary.GapDefinition;
 import soot.jimple.infoflow.methodSummary.data.summary.MethodFlow;
 import soot.jimple.infoflow.methodSummary.data.summary.MethodSummaries;
+import soot.jimple.spark.summary.GapDefinition;
 
 /**
  * Class for compacting a set of method flow summaries
@@ -38,7 +38,6 @@ public class SummaryFlowCompactor {
 	public void compact() {
 		compactFlowSet();
 		removeDuplicateFlows();
-		compactGaps();
 	}
 	
 	/**
@@ -71,32 +70,6 @@ public class SummaryFlowCompactor {
 		logger.info("Removed {} flows in favour of more precise ones", flowsRemoved);
 	}
 	
-	/**
-	 * Compacts the set of gaps to remove unnecessary ones
-	 */
-	public void compactGaps() {
-		// If we only have incoming flows into a gap, but no outgoing ones, we
-		// can remove the gap and all its flows altogether
-		for (GapDefinition gd : summaries.getAllGaps()) {
-			if (summaries.getOutFlowsForGap(gd).isEmpty()) {
-				summaries.removeAll(summaries.getInFlowsForGap(gd));
-				summaries.removeGap(gd);
-			}
-		}
-		
-		// Remove all unused gaps that are never referenced
-		Set<GapDefinition> gaps = new HashSet<GapDefinition>(summaries.getAllGaps());
-		for (GapDefinition gd : gaps) {
-			boolean gapIsUsed = false;
-			for (MethodFlow flow : summaries.getAllFlows())
-				if (flow.source().getGap() == gd || flow.sink().getGap() == gd) {
-					gapIsUsed = true;
-					break;
-				}
-			if (!gapIsUsed)
-				summaries.removeGap(gd);
-		}
-	}
 	
 	/**
 	 * Removes duplicate flows from the given set of method summaries. A flow is
