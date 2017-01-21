@@ -106,8 +106,8 @@ public class Main {
 			public void onClassFinished(String className, MethodSummaries summaries,ClassObjects classObjects) {
 				// Write out the class
 				String summaryFile = className + ".xml";
-				write(classObjects,summaryFile,args[1]);
-				write(summaries, summaryFile, args[2]);
+//				write(classObjects,summaryFile,args[1]);
+//				write(summaries, summaryFile, args[2]);
 				System.out.println("Class " + className + " done.");
 			}
 			

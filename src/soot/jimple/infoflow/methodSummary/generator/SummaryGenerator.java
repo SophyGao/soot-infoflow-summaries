@@ -207,9 +207,9 @@ public class SummaryGenerator {
 						
 					MethodObjects methodObjects=null;
 					if(!classObjects.analyzed(methodSig)){
-						methodObjects=new MethodObjects(methodSig,lastGapId);
+						methodObjects=new MethodObjects(entry.getKey(),methodSig,lastGapId);
 					}
-					//if(methodSig.contains("java.io.BufferedWriter: void close()")){
+					if(methodSig.contains("java.io.CharArrayWriter: java.lang.String toString()")){
 						MethodSummaries newSums = createMethodSummary(classpath,
 								methodSig, entry.getKey(), gapManager,methodObjects);
 						if (handler != null)
@@ -220,7 +220,7 @@ public class SummaryGenerator {
 							classObjects.merge(methodObjects);
 						}
 						
-					//}
+					}
 				}
 				
 				System.out.println("Class summaries for " + entry.getKey() + " done in "

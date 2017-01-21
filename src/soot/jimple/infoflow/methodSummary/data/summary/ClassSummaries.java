@@ -77,8 +77,10 @@ public class ClassSummaries {
 		ClassSummaries newSummaries = new ClassSummaries();
 		for (String className : classes) {
 			MethodSummaries methodSummaries = this.summaries.get(className);
-			if (methodSummaries != null && !methodSummaries.isEmpty())
+			if (methodSummaries != null && !methodSummaries.isEmpty()){
 				newSummaries.merge(className, methodSummaries.getFlowsForMethod(signature));
+				System.out.println("<"+className+": "+signature+">");
+			}
 		}
 		return newSummaries;
 	}
