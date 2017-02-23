@@ -41,7 +41,7 @@ public class Main {
 		SummaryGenerator generator = new SummaryGeneratorFactory().initSummaryGenerator();
 		
 		// Collect the classes to be analyzed from our command line
-		final int offset = 2;
+		final int offset = 3;
 		List<String> classesToAnalyze = new ArrayList<String>(args.length - offset);
 		int i = offset;
 		while (i < args.length) {
@@ -106,8 +106,8 @@ public class Main {
 			public void onClassFinished(String className, MethodSummaries summaries,ClassObjects classObjects) {
 				// Write out the class
 				String summaryFile = className + ".xml";
-//				write(classObjects,summaryFile,args[1]);
-//				write(summaries, summaryFile, args[2]);
+				write(classObjects,summaryFile,args[1]);
+				write(summaries, summaryFile, args[2]);
 				System.out.println("Class " + className + " done.");
 			}
 			
