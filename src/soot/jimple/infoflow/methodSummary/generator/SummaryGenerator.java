@@ -209,7 +209,7 @@ public class SummaryGenerator {
 					if(!classObjects.analyzed(methodSig)){
 						methodObjects=new MethodObjects(entry.getKey(),methodSig,lastGapId);
 					}
-					if(methodSig.contains("java.io.CharArrayWriter: java.lang.String toString()")){
+				//	if(methodSig.contains("evaluate(float,java.lang.Object,java.lang.Object)")){
 						MethodSummaries newSums = createMethodSummary(classpath,
 								methodSig, entry.getKey(), gapManager,methodObjects);
 						if (handler != null)
@@ -220,7 +220,7 @@ public class SummaryGenerator {
 							classObjects.merge(methodObjects);
 						}
 						
-					}
+				//	}
 				}
 				
 				System.out.println("Class summaries for " + entry.getKey() + " done in "
